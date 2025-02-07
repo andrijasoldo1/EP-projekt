@@ -39,6 +39,13 @@ return [
     |
     */
 
+    'aliases' => [
+    'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
+],
+
+
+
+
     'debug' => (bool) env('APP_DEBUG', false),
 
     /*
@@ -104,6 +111,12 @@ return [
             explode(',', env('APP_PREVIOUS_KEYS', ''))
         ),
     ],
+
+    
+    
+    
+    'locale' => 'hr',
+'charset' => 'UTF-8',
 
     /*
     |--------------------------------------------------------------------------
