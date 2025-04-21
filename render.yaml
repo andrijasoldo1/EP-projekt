@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: toplaw-backend
+    env: php
+    plan: free
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+      php artisan key:generate
+      mkdir -p /data
+      touch /data/database.sqlite
+      php artisan migrate --force
+    startCommand: php artisan serve --host 0.0.0.0 --port 10000
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://toplaw-backend.onrender.com
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /data/database.sqlite
+      - key: CACHE_PREFIX
+        value: toplaw_cache_
+      - key: APP_KEY
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
