@@ -144,18 +144,32 @@ $pdf = Pdf::loadView('pdf.legal_document', [
 
         $pdf->save($pdfPath);
 
-        return response()->download($pdfPath)->deleteFileAfterSend(true);
+        return response()->json([
+            'message' => 'Signed PDF generated successfully.',
+            'file_url' => asset("storage/documents/Legal_Document_{$conversationId}.pdf")
+        ]);
+        
+        
     }
 
     /**
      * Dohvaća razgovor
      */
     private function getConversation($conversationId)
-    {
-        return Conversation::where('id', $conversationId)
-            ->where('user_id', auth()->id())
-            ->firstOrFail();
+{
+    // Use the correct guard for API context
+    $user = auth('sanctum')->user();
+
+    if (!$user) {
+        Log::warning("API access without authenticated user for conversation ID: $conversationId");
+        abort(401, 'Unauthorized');
     }
+
+    return Conversation::where('id', $conversationId)
+        ->where('user_id', $user->id)
+        ->firstOrFail();
+}
+
 
     /**
      * Dohvaća AI odgovor
@@ -172,7 +186,7 @@ $pdf = Pdf::loadView('pdf.legal_document', [
 
     // Dinamički generiraj upute na temelju vrste dokumenta
     $instructions = match ($conversation->document_type) {
-        'tužba' => 'Generiraj pravni dokument u obliku tužbe s relevantnim pravnim osnovama i zahtjevima.',
+        'tužba' => 'Generiraj pravni dokument u obliku tužbe. Jasno odvoji sekcije: "Činjenični opis", "Pravni temelj", i "Zahtjev". Svaka sekcija mora imati jasan naslov i sadržaj koji NIJE identičan. Ne ponavljaj tekst.',
         'ugovor' => 'Generiraj pravni dokument u obliku kupoprodajnog ugovora s klauzulama, pravima i obvezama strana.',
         'opći dokument' => 'Generiraj pravni dokument u formalnom pravnom obliku na temelju dostupnih informacija.',
         default => 'Generiraj pravni dokument na temelju razgovora.',

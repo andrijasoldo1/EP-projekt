@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Events\LawsUpdated;
 
 class LawController extends Controller
 {
@@ -12,7 +13,6 @@ class LawController extends Controller
      */
     public function index()
     {
-        // List of laws with correct URLs
         $laws = [
             [
                 'title' => 'Zakon o pečatu institucija BiH',
@@ -30,7 +30,15 @@ class LawController extends Controller
                 'title' => 'Zakon o pravobranilaštvu',
                 'url' => 'http://www.mpr.gov.ba/biblioteka/zakoni/bs/Zakon%20o%20pravobranilastvu%20-%208%20-%2002.pdf'
             ],
+            [
+                'title' => 'Zakon o slobodi pristupa informacijama',
+                'url' => 'http://www.mpr.gov.ba/biblioteka/zakoni/bs/Zakon%20o%20slobodi%20pristupa.pdf'
+            ],
         ];
+
+        // Emituj događaj preko WebSocketa
+        event(new LawsUpdated($laws));
+
 
         return response()->json([
             'message' => 'List of laws retrieved successfully',
