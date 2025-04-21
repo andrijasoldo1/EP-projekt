@@ -64,6 +64,7 @@ class DocumentController extends Controller
      */
     public function generateSignedPdf(Request $request, $conversationId)
     {
+        set_time_limit(600);
         $conversation = $this->getConversation($conversationId);
         $chatbotResponse = $this->generateDocumentFromChatbot($conversationId);
 
@@ -82,7 +83,7 @@ class DocumentController extends Controller
             'ugovor' => ['Predmet ugovora', 'Obveze stranaka', 'Trajanje i raskid'],
             default => ['Opći podaci', 'Sadržaj', 'Zaključak'],
         };
-        
+
         $data = [];
         foreach ($sections as $section) {
             $data[$section] = $this->extractSection($chatbotResponse, $section) ?? "Podaci nisu dostupni.";
@@ -109,7 +110,7 @@ class DocumentController extends Controller
         $qrCode = base64_encode(QrCode::format('png')->size(200)->generate($verificationUrl));
 
         // Kreiranje PDF-a
-        $pdfPath = public_path("downloads/Pravni_Dokument_{$conversationId}.pdf");
+        $pdfPath = public_path("documents/Pravni_Dokument_{$conversationId}.pdf");
 
         $sections = match ($conversation->document_type) {
             'tužba' => ['Činjenični opis', 'Pravni temelj', 'Zahtjev'],
@@ -117,7 +118,7 @@ class DocumentController extends Controller
             'punomoć' => ['Opunomoćenik', 'Opunomoćitelj', 'Sadržaj punomoći'],
             default => ['Opći podaci', 'Sadržaj', 'Zaključak'],
         };
-        
+
         // Kreiraj dinamične sekcije
         // Dinamično kreiranje sekcija ovisno o vrsti dokumenta
 $data = [
@@ -140,7 +141,7 @@ $pdf = Pdf::loadView('pdf.legal_document', [
     'isRemoteEnabled' => true
 ]);
 
-        
+
 
         $pdf->save($pdfPath);
 

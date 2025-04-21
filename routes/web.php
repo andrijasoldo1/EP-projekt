@@ -9,9 +9,6 @@ use App\Http\Controllers\SignatureController;
 use App\Http\Controllers\LawController;
 
 
-
-
-
 Route::get('/', function () {
     return view('welcome');
 });
