@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Events\LawsUpdated;
 
 class LawController extends Controller
 {
@@ -14,8 +15,13 @@ class LawController extends Controller
             ['title' => 'Zakon o izmjenama Zakona o pečatu', 'url' => 'http://www.mpr.gov.ba/biblioteka/zakoni/bs/Zakon%20o%20izmjenama%20Zakona%20o%20pecatu%20-%2014-03.pdf'],
             ['title' => 'Zakon o zastavi BiH', 'url' => 'http://www.mpr.gov.ba/biblioteka/zakoni/bs/Zakon%20o%20zastavi%20BiH%20-%2019%20-%2001.pdf'],
             ['title' => 'Zakon o pravobranilaštvu', 'url' => 'http://www.mpr.gov.ba/biblioteka/zakoni/bs/Zakon%20o%20pravobranilastvu%20-%208%20-%2002.pdf'],
+            ['title' => 'Zakon o slobodi pristupa informacijama', 'url' => 'http://www.mpr.gov.ba/biblioteka/zakoni/bs/Zakon%20o%20slobodi%20pristupa.pdf'],
         ];
 
-        return view('laws', compact('laws'));
+        // Emitiraj event preko WebSocketa
+        event(new LawsUpdated($laws));
+
+        // Vrati kao JSON za Vue frontend
+        return response()->json(['laws' => $laws]);
     }
 }
